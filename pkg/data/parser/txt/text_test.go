@@ -61,9 +61,11 @@ func TestTextDataParser_Parse(t *testing.T) {
 		},
 		"testformat1_2021-07-07.txt",
 		[][]interface{}{
-			{"Diabetes", true, 1},
-			{"Asthma", false, -14},
-			{"Stroke", true, 122},
+			{"Strokertgh", true, 122},
+			{"dsdadjaod0", true, 212},
+			{"dadjaidjoa", false, 129},
+			{"d", true, 333},
+			{"dddddaaaaa", false, 123},
 		},
 	)
 }

@@ -69,6 +69,8 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 			// through.
 
 			isInvalidLine := false
+
+		FieldLoop:
 			for _, field := range sch.Entries {
 				if idx >= len(line) {
 					// Line has nothing to parse anymore.
@@ -78,7 +80,7 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 				for {
 					if idx >= len(line) {
 						isInvalidLine = true
-						break
+						break FieldLoop
 					}
 					if line[idx] == ' ' || line[idx] == '\t' {
 						idx++
@@ -88,6 +90,18 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 				}
 				switch field.DataType {
 				case schema.DataTypeBoolean:
+					// skip remaining non-0 or 1 text
+					for {
+						if idx < len(line) && !(line[idx] == '0' || line[idx] == '1') {
+							idx++
+						} else {
+							break
+						}
+					}
+					if idx >= len(line) {
+						isInvalidLine = true
+						break FieldLoop
+					}
 					if line[idx] == '0' {
 						idx += field.Width // Must be 1
 						parsedRow = append(parsedRow, false)
@@ -99,8 +113,20 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 						continue
 					}
 					isInvalidLine = true
-					break
+					break FieldLoop
 				case schema.DataTypeInteger:
+					// skip remaining non-number text
+					for {
+						if idx < len(line) && !('0' <= line[idx] && line[idx] <= '9' || line[idx] == '-') {
+							idx++
+						} else {
+							break
+						}
+					}
+					if idx >= len(line) {
+						isInvalidLine = true
+						break FieldLoop
+					}
 					seg := ""
 					start := idx
 					if idx < len(line) && idx-start < field.Width && line[idx] == '-' {
@@ -115,11 +141,15 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 							break
 						}
 					}
+					if len(seg) == 0 {
+						isInvalidLine = true
+						break FieldLoop
+					}
 					v, err := strconv.Atoi(seg)
 					if err != nil {
 						logrus.Error(errors.Wrap(err, errMsg))
 						isInvalidLine = true
-						break
+						break FieldLoop
 					}
 					parsedRow = append(parsedRow, v)
 					continue
