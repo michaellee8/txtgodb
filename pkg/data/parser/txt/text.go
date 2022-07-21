@@ -127,11 +127,11 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 					seg := ""
 					start := idx
 					for {
-						if idx < len(line) && idx-start < field.Width && line[idx] == ' ' || line[idx] == '\t' {
-							break
-						} else {
+						if idx < len(line) && idx-start < field.Width && (line[idx] != ' ' && line[idx] != '\t') {
 							seg += line[idx : idx+1]
 							idx++
+						} else {
+							break
 						}
 					}
 					parsedRow = append(parsedRow, seg)
