@@ -53,6 +53,8 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 				isLastLine = true
 			} else if err != nil {
 				logrus.Error(errors.Wrap(err, errMsg))
+			} else {
+				line = line[:len(line)-1]
 			}
 			var parsedRow []interface{}
 			idx := 0
@@ -100,7 +102,7 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 					seg := ""
 					start := idx
 					for {
-						if '0' <= line[idx] && line[idx] <= '9' && idx-start < field.Width && idx < len(line) {
+						if idx < len(line) && idx-start < field.Width && '0' <= line[idx] && line[idx] <= '9' {
 							seg += line[idx : idx+1]
 							idx++
 						} else {
@@ -119,7 +121,7 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 					seg := ""
 					start := idx
 					for {
-						if line[idx] == ' ' || line[idx] == '\t' && idx-start < field.Width && idx < len(line) {
+						if idx < len(line) && idx-start < field.Width && line[idx] == ' ' || line[idx] == '\t' {
 							break
 						} else {
 							seg += line[idx : idx+1]
