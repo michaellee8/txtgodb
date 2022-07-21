@@ -101,6 +101,10 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 				case schema.DataTypeInteger:
 					seg := ""
 					start := idx
+					if idx < len(line) && idx-start < field.Width && line[idx] == '-' {
+						seg += line[idx : idx+1]
+						idx++
+					}
 					for {
 						if idx < len(line) && idx-start < field.Width && '0' <= line[idx] && line[idx] <= '9' {
 							seg += line[idx : idx+1]
