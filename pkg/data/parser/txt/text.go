@@ -39,7 +39,9 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 	go func() {
 		defer func() {
 			derr := file.Close()
-			logrus.Error(errors.Wrap(derr, errMsg))
+			if derr != nil {
+				logrus.Error(errors.Wrap(derr, errMsg))
+			}
 		}()
 
 		defer close(ownChan)
