@@ -78,8 +78,9 @@ func (l *DataLoader) LoadData(
 				var wg sync.WaitGroup
 				for _, dataFile := range dataFiles {
 					wg.Add(1)
+					localDataFile := dataFile
 					go func() {
-						readCh, err := l.dataParser.Parse(sch, "file://"+dataFile)
+						readCh, err := l.dataParser.Parse(sch, "file://"+localDataFile)
 						if err != nil {
 							logrus.Error(errors.Wrap(err, errMsg))
 						}
