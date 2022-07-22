@@ -22,6 +22,7 @@ const driverPg = "postgres"
 const driverMysql = "mysql"
 const driverSqlite3 = "sqlite"
 
+//goland:noinspection GoNameStartsWithPackageName
 type SQLDataSinker struct {
 }
 
@@ -82,7 +83,7 @@ func (s *SQLDataSinker) Sink(
 	for dataRow := range dataCh {
 		ds := dsWithoutVals.
 			Vals(
-				goqu.Vals(dataRow),
+				dataRow,
 			)
 		stmt, args, err := ds.ToSQL()
 		if err != nil {

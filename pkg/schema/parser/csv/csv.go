@@ -12,6 +12,7 @@ import (
 	"strconv"
 )
 
+//goland:noinspection GoNameStartsWithPackageName
 type CSVSchemaParser struct {
 }
 
