@@ -2,6 +2,7 @@ package txt
 
 import (
 	"bufio"
+	"github.com/google/wire"
 	"github.com/michaellee8/txtgodb/pkg/data/parser"
 	"github.com/michaellee8/txtgodb/pkg/schema"
 	"github.com/pkg/errors"
@@ -186,3 +187,8 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 }
 
 var _ parser.DataParser = (*TextDataParser)(nil)
+
+var ParserSet = wire.NewSet(
+	wire.Bind(new(parser.DataParser), new(*TextDataParser)),
+	NewTextDataParser,
+)

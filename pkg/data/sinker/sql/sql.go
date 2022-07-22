@@ -9,6 +9,7 @@ import (
 	_ "github.com/doug-martin/goqu/v9/dialect/sqlite3"
 	"github.com/elliotchance/pie/v2"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/google/wire"
 	_ "github.com/lib/pq"
 	"github.com/michaellee8/txtgodb/pkg/data/sinker"
 	"github.com/michaellee8/txtgodb/pkg/schema"
@@ -137,3 +138,8 @@ func (_ *SQLDataSinker) getTableInitializeStatement(sch schema.Schema, driverNam
 }
 
 var _ sinker.DataSinker = (*SQLDataSinker)(nil)
+
+var SinkerSet = wire.NewSet(
+	wire.Bind(new(sinker.DataSinker), new(*SQLDataSinker)),
+	NewSQLDataSinker,
+)

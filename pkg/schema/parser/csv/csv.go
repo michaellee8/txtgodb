@@ -97,4 +97,7 @@ func (p *CSVSchemaParser) Parse(urlStr string) (sch schema.Schema, err error) {
 
 var _ parser.SchemaParser = (*CSVSchemaParser)(nil)
 
-var ParserSet = wire.NewSet(wire.Bind(new(parser.SchemaParser), new(*CSVSchemaParser)))
+var ParserSet = wire.NewSet(
+	wire.Bind(new(parser.SchemaParser), new(*CSVSchemaParser)),
+	NewCSVParser,
+)
