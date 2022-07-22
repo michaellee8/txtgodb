@@ -1,0 +1,16 @@
+version: "3"
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      - MYSQL_ROOT_PASSWORD=very-secure-password
+      - MYSQL_DATABASE=txtgodb
+    ports:
+      - "3306:3306"
+  pg:
+    image: postgres:14
+    environment:
+      - POSTGRES_PASSWORD=very-secure-password
+      - POSTGRES_DB=txtgodb
+    ports:
+      - "5432:5432"
