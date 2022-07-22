@@ -1,5 +1,5 @@
 "column name",width,datatype
-name,10,TEXT
+name,10,
 valid,1,BOOLEAN
 count,3,INTEGER
 valid2,1,BOOLEAN

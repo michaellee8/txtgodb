@@ -56,7 +56,9 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 			} else if err != nil {
 				logrus.Error(errors.Wrap(err, errMsg))
 			} else {
-				line = line[:len(line)-1]
+				if line[len(line)-1] == '\n' {
+					line = line[:len(line)-1]
+				}
 			}
 			var parsedRow []interface{}
 			idx := 0
@@ -66,7 +68,7 @@ func (p *TextDataParser) Parse(sch schema.Schema, urlStr string) (ch <-chan []in
 			// Otherwise, the parsing logic can be O( (num of characters) ^ (num of fields) ).
 			// The whole line will be skipped if any invalid field is found.
 			// It is also assumed that the data is ascii only, unicode support can be implemented with a similar algo
-			// through.
+			// through. A Unix line delimiter is also assumed.
 
 			isInvalidLine := false
 
