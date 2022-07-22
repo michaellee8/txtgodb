@@ -1,7 +1,17 @@
 package sinker
 
-import "github.com/michaellee8/txtgodb/pkg/schema"
+import (
+	"context"
+	"github.com/michaellee8/txtgodb/pkg/schema"
+)
 
 type DataSinker interface {
-	Sink(sch schema.Schema, driver string, dsn string, dataCh <-chan []interface{}) error
+	Sink(
+		ctx context.Context,
+		sch schema.Schema,
+		driver string,
+		dsn string,
+		dataCh <-chan []interface{},
+		tableName string,
+	) error
 }

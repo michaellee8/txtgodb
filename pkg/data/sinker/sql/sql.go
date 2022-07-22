@@ -1,7 +1,13 @@
 package sql
 
 import (
+	"context"
 	"database/sql"
+	"github.com/doug-martin/goqu/v9"
+	_ "github.com/doug-martin/goqu/v9/dialect/mysql"
+	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
+	_ "github.com/doug-martin/goqu/v9/dialect/sqlite3"
+	"github.com/elliotchance/pie/v2"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	"github.com/michaellee8/txtgodb/pkg/data/sinker"
@@ -22,8 +28,23 @@ func NewSQLDataSinker() *SQLDataSinker {
 	return &SQLDataSinker{}
 }
 
-func (s *SQLDataSinker) Sink(sch schema.Schema, driver string, dsn string, dataCh <-chan []interface{}) (err error) {
+func (s *SQLDataSinker) Sink(
+	ctx context.Context,
+	sch schema.Schema,
+	driver string,
+	dsn string,
+	dataCh <-chan []interface{},
+	tableName string,
+) (err error) {
 	const errMsg = "cannot sink data into sql db"
+
+	switch driver {
+	case driverPg:
+	case driverMysql:
+	case driverSqlite3:
+	default:
+		return errors.Wrap(errors.New("invalid driver"), errMsg)
+	}
 
 	db, err := sql.Open(driver, dsn)
 	if err != nil {
@@ -34,8 +55,46 @@ func (s *SQLDataSinker) Sink(sch schema.Schema, driver string, dsn string, dataC
 	// a concurrent and batched solution can be implemented if a larger throughput is required and sequential
 	// consistency is not required.
 
-	_ = db
+	createStmt, err := s.getTableInitializeStatement(sch, driver, tableName)
+	if err != nil {
+		return errors.Wrap(err, errMsg)
+	}
+
+	_, err = db.ExecContext(ctx, createStmt)
+	if err != nil {
+		return errors.Wrap(err, errMsg)
+	}
+
+	colNames := pie.Map(sch.Entries, func(entry schema.Entry) any {
+		return entry.ColumnName
+	})
+
+	dialect := goqu.Dialect(driver)
+
+	// Performance can be further optimized with native prepared statements and stuffs.
+
+	dsWithoutVals := dialect.
+		Insert(tableName).
+		Prepared(true).
+		Cols(colNames...)
+
+	for dataRow := range dataCh {
+		ds := dsWithoutVals.
+			Vals(
+				goqu.Vals(dataRow),
+			)
+		stmt, args, err := ds.ToSQL()
+		if err != nil {
+			return errors.Wrap(err, errMsg)
+		}
+		_, err = db.ExecContext(ctx, stmt, args...)
+		if err != nil {
+			return errors.Wrap(err, errMsg)
+		}
+	}
+
 	return nil
+
 }
 
 func (_ *SQLDataSinker) getTableInitializeStatement(sch schema.Schema, driverName string, tableName string) (stmt string, err error) {

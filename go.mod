@@ -13,6 +13,7 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/doug-martin/goqu/v9 v9.18.0 // indirect
+	github.com/elliotchance/pie/v2 v2.0.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/google/wire v0.5.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
@@ -21,9 +22,10 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/stretchr/objx v0.4.0 // indirect
-	golang.org/x/mod v0.3.0 // indirect
+	golang.org/x/exp v0.0.0-20220321173239-a90fa8a75705 // indirect
+	golang.org/x/mod v0.6.0-dev.0.20211013180041-c96bc1413d57 // indirect
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
-	golang.org/x/tools v0.0.0-20201124115921-2c860bdd6e78 // indirect
+	golang.org/x/tools v0.1.8-0.20211029000441-d6a9af8af023 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/uint128 v1.1.1 // indirect
