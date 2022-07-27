@@ -16,6 +16,7 @@ import (
 	"github.com/pkg/errors"
 	_ "modernc.org/sqlite"
 	"strconv"
+	"strings"
 )
 
 const driverPg = "postgres"
@@ -120,13 +121,13 @@ func (_ *SQLDataSinker) getTableInitializeStatement(sch schema.Schema, driverNam
 	for _, field := range sch.Entries {
 		switch field.DataType {
 		case schema.DataTypeText:
-			stmt += field.ColumnName + ` VARCHAR(` + strconv.Itoa(field.Width) + `) NOT NULL, `
+			stmt += cleanTableName(field.ColumnName) + ` VARCHAR(` + strconv.Itoa(field.Width) + `) NOT NULL, `
 		case schema.DataTypeBoolean:
-			stmt += field.ColumnName + ` BOOLEAN NOT NULL, `
+			stmt += cleanTableName(field.ColumnName) + ` BOOLEAN NOT NULL, `
 		case schema.DataTypeInteger:
 			// It should be possible to determine the smallest integer type required here by calculate the field width,
 			// so that storage space can be optimized.
-			stmt += field.ColumnName + ` BIGINT NOT NULL, `
+			stmt += cleanTableName(field.ColumnName) + ` BIGINT NOT NULL, `
 		}
 	}
 
@@ -144,3 +145,24 @@ var SinkerSet = wire.NewSet(
 	wire.Bind(new(sinker.DataSinker), new(*SQLDataSinker)),
 	NewSQLDataSinker,
 )
+
+func cleanTableName(name string) string {
+	return strings.Map(func(r rune) rune {
+		if 'a' <= r && r <= 'z' {
+			return r
+		}
+		if 'A' <= r && r <= 'Z' {
+			return r
+		}
+		if '0' <= r && r <= '9' {
+			return r
+		}
+		if ' ' == r {
+			return r
+		}
+		if '_' == r {
+			return r
+		}
+		return -1
+	}, name)
+}
